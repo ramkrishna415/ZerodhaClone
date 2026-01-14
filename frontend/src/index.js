@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import{BrowserRouter, Routes, Route } from "react-router-dom"
+import{BrowserRouter, Routes, Route ,Navigate} from "react-router-dom"
 import './index.css';
 import HomePage from './landing_page/home/Homepage';
 import Signup from './landing_page/signup/signup.js';
@@ -13,20 +13,23 @@ import Footer from './landing_page/Footer';
 import Notfound from './landing_page/Notfound.js';
 
 
-
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/" />; 
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
  <BrowserRouter>
    <Navbar/>
  <Routes>
-   <Route path="/signup" element={<Signup />} />
+   {/* <Route path="/" element={<Signup />} /> */}
   <Route path="/" element={<HomePage/>}/>
   <Route path="/signup" element={<Signup/>}/>
-  <Route path="/about" element={<AboutPage/>}/>
-  <Route path="/product" element={<ProductPage/>}/>
-  <Route path="/pricing" element={<PricingPage/>}/>
-  <Route path="/support" element={<SupportPage/>}/>
+  <Route path="/about" element={<ProtectedRoute><AboutPage/></ProtectedRoute>}/>
+  <Route path="/product" element={<ProtectedRoute><ProductPage/></ProtectedRoute>}/>
+  <Route path="/pricing" element={<ProtectedRoute><PricingPage/></ProtectedRoute>}/>
+  <Route path="/support" element={<ProtectedRoute><SupportPage/></ProtectedRoute>}/>
   <Route path="*" element={<Notfound/>}/>
  </Routes>
   <Footer/>

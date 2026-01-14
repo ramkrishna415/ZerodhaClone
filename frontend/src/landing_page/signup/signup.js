@@ -1,76 +1,120 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+// import "./index.css"; // Fixed: Path corrected
 
 const Signup = () => {
+  const [isSignup, setIsSignup] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+    name: "",
+    username: "",
+    email: "",
+    password: ""
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await axios.post('http://localhost:3001/api/signup', formData);
-      alert(res.data.message);
-    } catch (error) {
-      console.error(error);
-      alert("Signup failed");
+      if (isSignup) {
+        // SIGNUP API Call
+        const res = await axios.post(
+          "http://localhost:3002/api/register",
+          formData
+        );
+        alert(res.data.message || "Registration Successful!");
+        setIsSignup(false); // Signup ke baad Login mode par switch karein
+      } else {
+        // LOGIN API Call
+        const res = await axios.post(
+          "http://localhost:3002/api/login",
+          {
+            username: formData.username,
+            password: formData.password
+          }
+        );
+
+        localStorage.setItem("token", res.data.token);
+        alert("Login Successful");
+        navigate("/"); // Yahan apne home/dashboard page ka path dein
+      }
+    } catch (err) {
+      // Error handling behtar banayi gayi hai
+      console.error(err);
+      alert(err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6 col-lg-5">
-          <div className="card shadow p-4">
-            <h3 className="text-center mb-4">Create Zerodha Account</h3>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Full Name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="name"
-                  placeholder="Enter your full name"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+    <div style={{ width: "350px", margin: "100px auto", textAlign: "center", padding: "20px", border: "1px solid #ccc", borderRadius: "10px" }}>
+      <h2>{isSignup ? "Create Account" : "Welcome Back"}</h2>
 
-              <div className="mb-3">
-                <label className="form-label">Email address</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  name="email"
-                  placeholder="Enter your email"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+      <form onSubmit={handleSubmit}>
+        {isSignup && (
+          <>
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              style={{ marginBottom: "10px", padding: "8px", width: "90%" }}
+              onChange={handleChange}
+              required
+            />
+            <br />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email Address"
+              style={{ marginBottom: "10px", padding: "8px", width: "90%" }}
+              onChange={handleChange}
+              required
+            />
+            <br />
+          </>
+        )}
 
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  name="password"
-                  placeholder="Enter password"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          style={{ marginBottom: "10px", padding: "8px", width: "90%" }}
+          onChange={handleChange}
+          required
+        />
+        <br />
 
-              <button type="submit" className="btn btn-primary w-100">Sign Up</button>
-            </form>
-          </div>
-        </div>
-      </div>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          style={{ marginBottom: "10px", padding: "8px", width: "90%" }}
+          onChange={handleChange}
+          required
+        />
+        <br />
+
+        <button type="submit" style={{ padding: "10px 20px", cursor: "pointer", background: "#007bff", color: "#fff", border: "none", borderRadius: "5px", width: "95%" }}>
+          {isSignup ? "Sign Up" : "Login"}
+        </button>
+      </form>
+
+      <p style={{ marginTop: "15px" }}>
+        {isSignup ? "Already have an account?" : "Don't have an account?"}
+        <span
+          style={{ color: "blue", cursor: "pointer", marginLeft: "5px", fontWeight: "bold" }}
+          onClick={() => setIsSignup(!isSignup)}
+        >
+          {isSignup ? "Login here" : "Signup here"}
+        </span>
+      </p>
     </div>
   );
 };
