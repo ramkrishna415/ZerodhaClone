@@ -27,7 +27,7 @@ const Signup = () => {
       if (isSignup) {
         // SIGNUP API Call
         const res = await axios.post(
-          "http://localhost:3002/api/register",
+          "https://zerodhaclone1-1lob.onrender.com/api/register",
           formData
         );
         alert(res.data.message || "Registration Successful!");
@@ -35,7 +35,7 @@ const Signup = () => {
       } else {
         // LOGIN API Call
         const res = await axios.post(
-          "http://localhost:3002/api/login",
+          "https://zerodhaclone1-1lob.onrender.com/api/login",
           {
             username: formData.username,
             password: formData.password
